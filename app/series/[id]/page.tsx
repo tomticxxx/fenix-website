@@ -1,8 +1,17 @@
 "use client";
 import { useParams } from "next/navigation";
-import { products, Product } from "../../../data/products";
+import { products } from "../../../data/products";
 import Link from "next/link";
-import { ChevronLeft, Check, Table, Activity, Cpu, Settings, MessageSquareQuote, ShieldCheck } from "lucide-react";
+import { 
+  ChevronLeft, 
+  Check, 
+  Table, 
+  Activity, 
+  Cpu, 
+  Settings, 
+  MessageSquareQuote, 
+  ShieldCheck 
+} from "lucide-react";
 
 // 品牌色彩配置
 const brandConfigs: { [key: string]: { color: string, bg: string, btn: string, border: string } } = {
@@ -13,7 +22,6 @@ const brandConfigs: { [key: string]: { color: string, bg: string, btn: string, b
   "韓國 LEIDEX": { color: "text-pink-600", bg: "bg-pink-50", btn: "bg-pink-600", border: "border-pink-200" },
 };
 
-// 完整欄位名稱對照表 (優化：增加更多常見製藥機械欄位)
 const labelMap: { [key: string]: string } = {
   capacity: "處理量 / Capacity",
   air: "進氣風量 / Air Volume",
@@ -33,6 +41,8 @@ const labelMap: { [key: string]: string } = {
   material: "主體材質 / Material",
   die_type: "模具規格 / Die Type",
   filling_accuracy: "充填精度 / Accuracy",
+  turret_stations: "沖數 / Stations",
+  max_tablet_diam: "最大片徑 / Max Tablet Diam.",
 };
 
 export default function SeriesDetailPage() {
@@ -51,22 +61,18 @@ export default function SeriesDetailPage() {
 
   const config = brandConfigs[product.brand] || { color: "text-slate-900", bg: "bg-slate-50", btn: "bg-slate-900", border: "border-slate-200" };
 
-  // 代理商專業技術備註邏輯 (優化：從 note 欄位讀取，若無則根據品牌顯示預設內容)
   const getTechnicalNote = () => {
     if (product.note) return product.note;
-
     const defaultNotes: { [key: string]: string } = {
-      "日本 FREUND": "FREUND 具備專利之進氣流道設計，能確保製劑過程中極高的混合均勻度。元堉作為代理服務窗口，可協助客戶與日方原廠進行技術參數確認，並提供在地化的安裝與定期點檢服務。",
-      "SKY SOFTGEL": "SKY 軟膠囊生產系統以高精密充填聞名。針對客戶之明膠配方或填充物料特性，元堉可協助對接原廠之精密模具選配與幫浦補償設定，並確保設備之機電整合符合 GMP 生產規範。",
-      "翰林航宇": "翰林航宇系列強調打錠過程的壓力穩定性與耐用度。元堉技術團隊提供專業之安裝驗證 (IQ/OQ) 支援與原廠零件供應，確保設備在連續高速運轉下的生產良率。",
-      "蘇州瀚隆 (HALO)": "HALO 膠囊充填系列具備優異的充填精度控制。元堉提供專業之製程選配建議（如粉體、顆粒、錠劑充填模組），並負責後續之技術教育訓練與故障排除，確保客戶產線運作不中斷。",
-      "韓國 LEIDEX": "LEIDEX 填充設備針對化妝品料體特性提供多樣化噴頭配置。元堉可協助針對客戶容器形狀與料體黏稠度與原廠進行選型對接，提供完整之自動化產線整合規劃建議。"
+      "日本 FREUND": "FREUND 具備專利進氣流道設計，能確保製劑過程極高均勻度。元堉協助原廠技術對接與在地安裝點檢。",
+      "SKY SOFTGEL": "SKY 軟膠囊系統以高精密充填聞名。元堉協助原廠模具選配與補償設定，確保符合 GMP 規範。",
+      "翰林航宇": "強調打錠過程壓力穩定性。元堉技術團隊提供安裝驗證 (IQ/OQ) 支援，確保高速運轉生產良率。",
+      "蘇州瀚隆 (HALO)": "具備優異充填精度控制。元堉提供粉體、顆粒充填模組選配建議，確保產線運作不中斷。",
+      "韓國 LEIDEX": "針對化妝品料體提供多樣噴頭配置。元堉協助容器形狀選型對接與自動化產線整合規劃。"
     };
-
-    return defaultNotes[product.brand] || "上述規格資訊由原廠提供，標準配置可能依生產需求調整。元堉提供完整之原廠技術對接、售後安裝與機電維修服務。如需詳細技術手冊或製程規劃建議，歡迎與我們連繫。";
+    return defaultNotes[product.brand] || "規格由原廠提供，標準配置依生產需求調整。元堉提供原廠技術對接、售後安裝與維修服務。";
   };
 
-  // 處理標題顯示邏輯
   const displayTitle = product.series || product.name;
 
   return (
@@ -90,90 +96,98 @@ export default function SeriesDetailPage() {
                 <h2 className="text-2xl font-bold text-slate-500">{product.name_zh}</h2>
               </div>
             </div>
-            <Link href="/contact" className={`${config.btn} text-white px-10 py-5 rounded-2xl font-black shadow-2xl hover:brightness-110 transition-all active:scale-95 flex items-center gap-3 shrink-0`}>
+            <Link href="/contact" className={`${config.btn} text-white px-10 py-5 rounded-2xl font-black shadow-2xl hover:brightness-110 hover:scale-105 transition-all active:scale-95 flex items-center gap-3 shrink-0`}>
               索取技術規格書 <ChevronLeft className="w-4 h-4 rotate-180" />
             </Link>
           </div>
         </div>
-        <div className={`absolute -right-20 -bottom-20 text-[20rem] font-black ${config.color} opacity-[0.03] select-none uppercase`}>
-          {product.brand.split(' ')[0]}
-        </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-6 mt-20">
-        {/* 2. 技術設計與共通規格 */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-16 mb-24">
-          <div className="lg:col-span-2">
-            <h2 className="text-3xl font-black mb-8 flex items-center gap-3">
-              <Cpu className={`w-8 h-8 ${config.color}`} /> 技術設計特點
-            </h2>
-            <p className="text-slate-500 leading-relaxed text-xl mb-12 font-medium border-l-4 pl-6 border-slate-100 whitespace-pre-line">
-              {product.description}
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-20">
-              {product.features.map((feature, index) => (
-                <div key={index} className="flex items-start p-6 bg-slate-50 rounded-[2rem] border border-slate-100 hover:bg-white hover:shadow-xl transition-all group">
-                  <div className={`w-8 h-8 rounded-xl ${config.bg} flex items-center justify-center shrink-0 mr-4 group-hover:scale-110 transition-transform`}>
-                    <Check className={`w-5 h-5 ${config.color}`} />
+          
+          <div className="lg:col-span-2 space-y-16">
+            <section>
+              <h2 className="text-3xl font-black mb-8 flex items-center gap-3">
+                <Cpu className={`w-8 h-8 ${config.color}`} /> 技術設計特點
+              </h2>
+              <p className="text-slate-500 leading-relaxed text-xl mb-12 font-medium border-l-4 pl-6 border-slate-100 whitespace-pre-line">
+                {product.description}
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {product.features.map((feature, index) => (
+                  <div key={index} className="flex items-start p-6 bg-slate-50 rounded-[2rem] border border-slate-100 hover:bg-white hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                    <div className={`w-8 h-8 rounded-xl ${config.bg} flex items-center justify-center shrink-0 mr-4 group-hover:scale-110 transition-transform`}>
+                      <Check className={`w-5 h-5 ${config.color}`} />
+                    </div>
+                    <span className="text-slate-700 font-bold leading-snug pt-1">{feature}</span>
                   </div>
-                  <span className="text-slate-700 font-bold leading-snug pt-1">{feature}</span>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            </section>
 
-            {/* 共通技術參數 */}
             {Object.keys(product.specs).length > 0 && (
-              <div>
+              <section>
                 <h2 className="text-3xl font-black mb-8 flex items-center gap-3">
                   <Settings className={`w-8 h-8 ${config.color}`} /> 共通技術參數
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-2">
                   {Object.entries(product.specs).map(([key, value], idx) => (
-                    <div key={idx} className="flex justify-between items-center py-5 border-b border-slate-100">
-                      <span className="text-slate-400 font-bold text-sm tracking-widest uppercase">{labelMap[key] || key}</span>
-                      <span className="text-slate-900 font-black text-right ml-4 whitespace-pre-line">
-                        {Array.isArray(value) ? value.join(" / ") : value}
+                    <div key={idx} className="flex justify-between items-center py-5 border-b border-slate-100 hover:bg-slate-50/50 px-2 transition-colors">
+                      <span className="text-slate-400 font-bold text-sm tracking-widest uppercase shrink-0">{labelMap[key] || key}</span>
+                      <span className="text-slate-900 font-black text-right ml-4 whitespace-pre-line leading-relaxed">
+                        {Array.isArray(value) ? value.join("\n") : value}
                       </span>
                     </div>
                   ))}
                 </div>
-              </div>
+              </section>
             )}
           </div>
           
+          {/* 右側：圖片展示優化 */}
           <div className="space-y-8">
-            <div className={`p-10 rounded-[3rem] border-2 ${config.border} ${config.bg} shadow-sm`}>
-              <h3 className={`text-xl font-black mb-8 ${config.color} flex items-center gap-2`}>
+            {product.image && (
+              <div className="relative aspect-square w-full flex items-center justify-center rounded-[2.5rem] bg-slate-50/50 border border-slate-100 p-6 shadow-sm group overflow-hidden transition-all duration-500 hover:shadow-xl hover:border-slate-200">
+                <img 
+                  src={product.image} 
+                  alt={product.name_zh}
+                  className="w-full h-full object-contain z-10 transition-all duration-700 ease-in-out group-hover:scale-110 filter group-hover:drop-shadow-2xl"
+                />
+                {/* 裝飾背光：微調為更淡的色調，讓 JPG 圖片邊緣更融合 */}
+                <div className={`absolute inset-0 ${config.bg} opacity-20 blur-3xl group-hover:opacity-40 transition-opacity duration-700`}></div>
+              </div>
+            )}
+
+            <div className={`p-8 rounded-[2.5rem] border ${config.border} ${config.bg} hover:shadow-lg transition-shadow`}>
+              <h3 className={`text-lg font-black mb-6 ${config.color} flex items-center gap-2`}>
                  <Activity className="w-5 h-5" /> 適用產業應用
               </h3>
               <div className="flex flex-wrap gap-2">
                 {product.application.map((app, index) => (
-                  <span key={index} className="px-4 py-2 bg-white text-slate-700 font-black rounded-xl text-sm border border-slate-100 shadow-sm">
+                  <span key={index} className="px-3 py-1.5 bg-white text-slate-700 font-black rounded-lg text-xs border border-slate-100 shadow-sm hover:border-slate-300 transition-colors">
                     {app}
                   </span>
                 ))}
               </div>
             </div>
 
-            <div className="p-10 bg-slate-900 rounded-[3rem] text-white relative overflow-hidden group">
-              <div className="relative z-10">
-                <MessageSquareQuote className="w-10 h-10 text-slate-500 mb-6 group-hover:text-blue-400 transition-colors" />
-                <h3 className="text-xl font-black mb-4">技術支援備註</h3>
-                <p className="text-slate-400 text-sm leading-relaxed font-medium whitespace-pre-line">
-                  {getTechnicalNote()}
-                </p>
-                <div className="mt-8 pt-6 border-t border-white/10 flex items-center gap-3">
-                  <ShieldCheck className="w-5 h-5 text-emerald-400" />
-                  <span className="text-xs font-black text-slate-500 uppercase tracking-widest">Authorized Distributor Support</span>
-                </div>
+            <div className="p-8 bg-slate-900 rounded-[2.5rem] text-white relative overflow-hidden group">
+              <MessageSquareQuote className="w-8 h-8 text-slate-600 mb-4 group-hover:text-white/40 transition-colors" />
+              <h3 className="text-lg font-black mb-3 italic">技術支援備註</h3>
+              <p className="text-slate-400 text-xs leading-relaxed font-medium whitespace-pre-line">
+                {getTechnicalNote()}
+              </p>
+              <div className="mt-6 pt-4 border-t border-white/10 flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.1em]">Distributor Support</span>
               </div>
-              <div className={`absolute -right-4 -bottom-4 w-24 h-24 ${config.btn} opacity-10 blur-3xl`}></div>
             </div>
           </div>
         </div>
 
-        {/* 3. 型號規格表 */}
-        {product.models && product.models.length > 0 && (
+        {/* 3. 型號規格對照表 */}
+        {product.models && product.models.length > 0 && product.models[0] && (
           <div className="mb-24">
             <div className="flex items-center gap-4 mb-10">
               <Table className={`w-10 h-10 ${config.color}`} />
@@ -188,9 +202,9 @@ export default function SeriesDetailPage() {
                 <table className="w-full text-left border-collapse min-w-[900px]">
                   <thead>
                     <tr className="bg-slate-900 text-white">
-                      <th className="p-8 font-black tracking-widest text-[11px] uppercase opacity-70 sticky left-0 bg-slate-900 z-10">型號 Model</th>
+                      <th className="p-8 font-black text-[11px] uppercase tracking-widest sticky left-0 bg-slate-900 z-10">型號 Model</th>
                       {Object.keys(product.models[0]).filter(k => k !== 'name').map((key) => (
-                        <th key={key} className="p-8 font-black text-[11px] tracking-widest uppercase border-l border-white/10 text-center whitespace-nowrap">
+                        <th key={key} className="p-8 font-black text-[11px] uppercase tracking-widest border-l border-white/10 text-center whitespace-nowrap">
                           {labelMap[key] || key}
                         </th>
                       ))}
@@ -199,15 +213,15 @@ export default function SeriesDetailPage() {
                   <tbody className="text-slate-700">
                     {product.models.map((model, idx) => (
                       <tr key={idx} className="border-b border-slate-50 hover:bg-slate-50/80 transition-colors group">
-                        <td className="p-8 font-black text-slate-900 bg-white sticky left-0 z-10 group-hover:bg-slate-50 shadow-[4px_0_10px_rgba(0,0,0,0.02)] transition-colors">
-                          <div className="flex items-center gap-3 italic">
-                            <div className={`w-2 h-2 rounded-full ${config.btn}`}></div>
+                        <td className="p-8 font-black text-slate-900 bg-white sticky left-0 z-10 group-hover:bg-slate-50 transition-colors italic">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-2 h-2 rounded-full ${config.btn} group-hover:scale-150 transition-transform`}></div>
                             {model.name}
                           </div>
                         </td>
                         {Object.entries(model).filter(([k]) => k !== 'name').map(([key, value], vIdx) => (
-                          <td key={vIdx} className="p-8 text-center border-l border-slate-50 font-mono font-black text-sm">
-                            <span className={['capacity', 'range', 'force'].includes(key) ? `${config.color} text-base` : 'text-slate-500'}>
+                          <td key={vIdx} className="p-8 text-center border-l border-slate-50 font-mono font-black text-sm whitespace-pre-line leading-normal">
+                            <span className={['capacity', 'force'].includes(key) ? `${config.color}` : 'text-slate-500'}>
                               {value || "—"}
                             </span>
                           </td>
@@ -221,21 +235,14 @@ export default function SeriesDetailPage() {
           </div>
         )}
 
-        {/* 4. 底部引導聯絡 */}
-        <div className="bg-slate-900 rounded-[4rem] p-16 text-center text-white relative overflow-hidden shadow-2xl">
+        <div className="bg-slate-900 rounded-[4rem] p-16 text-center text-white relative overflow-hidden shadow-2xl group">
           <div className="relative z-10">
-            <h2 className="text-4xl font-black mb-6 tracking-tight">需要針對您產線的客製選型建議？</h2>
-            <p className="text-slate-400 mb-10 max-w-xl mx-auto font-medium text-lg leading-relaxed">
-              作為授權代理商，我們提供從原廠技術對接、設備選型到售後維護的一站式服務。
-            </p>
-            <Link href="/contact" className={`${config.btn} text-white px-16 py-6 rounded-2xl font-black text-xl inline-flex items-center gap-4 hover:scale-105 transition-all shadow-2xl`}>
+            <h2 className="text-4xl font-black mb-6 tracking-tight italic">需要產線選型建議？</h2>
+            <Link href="/contact" className={`${config.btn} text-white px-16 py-6 rounded-2xl font-black text-xl inline-flex items-center gap-4 hover:brightness-110 hover:scale-105 transition-all shadow-2xl mt-4 active:scale-95`}>
               立即連繫技術顧問 <ChevronLeft className="rotate-180 w-6 h-6" />
             </Link>
           </div>
-          <div className={`absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none`}>
-            <div className={`absolute top-10 left-10 w-64 h-64 rounded-full ${config.bg} blur-[120px]`}></div>
-            <div className={`absolute bottom-10 right-10 w-64 h-64 rounded-full bg-blue-500 blur-[120px]`}></div>
-          </div>
+          <div className={`absolute -right-20 -bottom-20 w-64 h-64 ${config.btn} opacity-10 blur-[100px] group-hover:opacity-20 transition-opacity duration-700`}></div>
         </div>
       </div>
     </div>

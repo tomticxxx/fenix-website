@@ -7,7 +7,6 @@ import { leidexProducts } from "./brands/leidex";
 
 /**
  * 產品資料型別定義
- * 修正重點：新增 searchKeywords 以支援進階 AI 搜尋，並將 series 設為選填
  */
 export interface Product {
   id: string;
@@ -15,10 +14,10 @@ export interface Product {
   category: string;
   name: string;
   name_zh: string;
-  series?: string; // 改為選填，避免沒有系列名稱的產品報錯
+  image?: string; // 💡 關鍵修正：加入 image 屬性，解決編譯錯誤
+  series?: string; 
   tags: string[];
-  /** * AI 搜尋關鍵字：用於存放型號、應用領域、同義詞等
-   * 解決 ts(2322) 錯誤：'searchKeywords' does not exist in type 'Product'
+  /** * AI 搜尋關鍵字：用於存放型號變體、應用領域、同義詞等
    */
   searchKeywords?: string; 
   features: string[];
@@ -29,15 +28,13 @@ export interface Product {
     name: string;
     [key: string]: string | undefined; 
   }[];
-  /** * 技術備註/代理商補充說明
-   */
   note?: string; 
 }
 
 /**
- * 核心產品清單整合
+ * 核心產品原始清單整合
  */
-export const products: Product[] = [
+const rawProducts: Product[] = [
   ...skyProducts,
   ...hanlinProducts,
   ...haloProducts,
@@ -46,7 +43,27 @@ export const products: Product[] = [
 ];
 
 /**
- * 輔助方法：獲取所有品牌名稱（用於過濾按鈕）
+ * 💡 自動化加強搜尋權重
+ * 此步驟會確保即便原始資料沒寫 tags，搜尋引擎也能從 models 名稱中抓到型號
+ */
+export const products: Product[] = rawProducts.map(p => {
+  // 自動從 models 陣列中提取型號名稱
+  const modelNames = p.models?.map(m => m.name) || [];
+  
+  return {
+    ...p,
+    // 整合所有可能的搜尋字串，確保搜尋時「無死角」
+    tags: Array.from(new Set([
+      ...p.tags, 
+      ...modelNames, 
+      p.series || "",
+      p.searchKeywords || ""
+    ])).filter(tag => tag !== "")
+  };
+});
+
+/**
+ * 輔助方法：獲取所有品牌名稱
  */
 export const brands = Array.from(new Set(products.map((p) => p.brand)));
 
