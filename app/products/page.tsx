@@ -4,12 +4,13 @@ import { products, Product } from "../../data/products";
 import Link from "next/link";
 import { ChevronRight, Activity } from "lucide-react";
 
-// 品牌色彩配置與 ID 對照
+// 更新後的品牌色彩配置：確保 GELKO (鈦金灰) 與 ALL (純黑) 在視覺上有明確區隔
 const brandConfigs: { [key: string]: { id: string, color: string, bg: string, btn: string, border: string } } = {
   "SKY SOFTGEL": { id: "sky-softgel", color: "text-blue-600", bg: "bg-blue-50", btn: "bg-blue-600", border: "border-blue-600" },
   "翰林航宇": { id: "hanlin-hangyu", color: "text-red-600", bg: "bg-red-50", btn: "bg-red-600", border: "border-red-600" },
   "蘇州瀚隆 (HALO)": { id: "halo-pharma", color: "text-emerald-600", bg: "bg-emerald-50", btn: "bg-emerald-600", border: "border-emerald-600" },
   "日本 FREUND": { id: "japan-freund", color: "text-orange-600", bg: "bg-orange-50", btn: "bg-orange-600", border: "border-orange-600" },
+  "GELKO": { id: "gelko-seamless", color: "text-slate-700", bg: "bg-slate-100", btn: "bg-slate-700", border: "border-slate-700" }, // ✅ 鈦金灰
   "韓國 LEIDEX": { id: "korea-leidex", color: "text-pink-600", bg: "bg-pink-50", btn: "bg-pink-600", border: "border-pink-600" },
 };
 
@@ -50,15 +51,15 @@ export default function ProductsPage() {
         {/* 標題區 */}
         <div className="text-center mb-16 pt-10">
           <h1 className="text-5xl md:text-7xl font-black text-slate-900 mb-6 tracking-tight">
-            專業設備 <span className="text-blue-600 italic">PORTFOLIO</span>
+            設備清單 <span className="text-blue-600 italic">PORTFOLIO</span>
           </h1>
           <p className="text-slate-500 max-w-2xl mx-auto text-lg font-medium leading-relaxed">
-            三十年電機背景篩選，代理全球最穩定的製藥與彩妝生產系統。
+            三十年電機電子 (EE) 專業背景，為您篩選日本、韓國、大陸最穩定的製藥與彩妝生產系統。
           </p>
         </div>
 
         {/* 品牌導航 Tabs */}
-        <div className="flex flex-wrap justify-center gap-3 mb-24 sticky top-24 z-30 py-4 bg-slate-50/80 backdrop-blur-md">
+        <div className="flex flex-wrap justify-center gap-3 mb-24 sticky top-24 z-30 py-4 bg-slate-50/80 backdrop-blur-md px-4 rounded-3xl">
           {brands.map(brand => {
             const config = brandConfigs[brand];
             const isAll = brand === "ALL";
@@ -71,7 +72,7 @@ export default function ProductsPage() {
                 className={`px-8 py-3 rounded-2xl font-black transition-all border-2 ${
                   isActive 
                     ? isAll 
-                      ? "bg-slate-900 text-white border-transparent shadow-xl scale-105" 
+                      ? "bg-black text-white border-black shadow-xl scale-105" // ✅ 全部品牌選取時為純黑
                       : `${config.btn} text-white border-transparent shadow-xl scale-105`
                     : "bg-white text-slate-400 border-transparent hover:border-slate-200"
                 }`}
@@ -89,13 +90,12 @@ export default function ProductsPage() {
           return (
             <div key={brandName} id={config.id} className="mb-32 scroll-mt-40 animate-fadeIn">
               <div className="flex items-center gap-6 mb-12">
-                <h2 className={`text-5xl font-black tracking-tighter ${config.color}`}>{brandName}</h2>
+                <h2 className={`text-4xl md:text-5xl font-black tracking-tighter ${config.color}`}>{brandName}</h2>
                 <div className="h-[3px] flex-grow rounded-full bg-slate-200"></div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                 {items.map((product) => {
-                  // 修正重點：處理 series 為空的狀況
                   const displaySeries = product.series || product.category;
                   const firstLetter = displaySeries.charAt(0).toUpperCase();
 
@@ -128,14 +128,14 @@ export default function ProductsPage() {
                         {product.models && product.models.length > 0 && (
                           <div className={`mb-6 rounded-2xl ${config.bg} p-4 border border-white/50`}>
                             <div className="flex items-center gap-2 mb-3 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                              <Activity className="w-3 h-3 text-slate-400" /> 系列型號預覽
+                              <Activity className="w-3 h-3 text-slate-400" /> 技術參數預覽
                             </div>
                             <div className="space-y-2">
                               {product.models.slice(0, 3).map((m, idx) => (
                                 <div key={idx} className="flex justify-between text-[11px] border-b border-white/60 pb-1 last:border-0">
                                   <span className="font-bold text-slate-600">{m.name}</span>
                                   <span className={`${config.color} font-black font-mono uppercase`}>
-                                    {m.capacity || m.range || m.evaporation || "詳見規格"}
+                                    {m.speed || m.lane || m.capacity || m.range || "詳見規格"}
                                   </span>
                                 </div>
                               ))}
@@ -176,7 +176,8 @@ export default function ProductsPage() {
         <div className="mt-20 text-center bg-slate-900 rounded-[4rem] p-12 md:p-20 text-white relative overflow-hidden shadow-3xl">
           <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/10 blur-[120px] -mr-64 -mt-64"></div>
           <div className="relative z-10 max-w-3xl mx-auto">
-            <h2 className="text-4xl md:text-5xl font-black mb-8 leading-tight">需要更詳細的<br/>廠房規劃建議？</h2>
+            <h2 className="text-4xl md:text-5xl font-black mb-8 leading-tight">需要專業的<br/>產線規劃建議？</h2>
+            <p className="text-slate-400 mb-12 font-medium">從實驗室研發到量產規模，元堉技術顧問為您提供一對一設備選型諮詢。</p>
             <Link href="/contact" className="inline-flex items-center gap-4 bg-blue-600 text-white px-10 md:px-16 py-5 md:py-6 rounded-2xl font-black hover:bg-blue-500 transition-all text-lg md:text-xl shadow-2xl">
               連繫技術顧問 <ChevronRight className="w-6 h-6" />
             </Link>

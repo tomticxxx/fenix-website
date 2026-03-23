@@ -4,6 +4,7 @@ import { hanlinProducts } from "./brands/hanlin";
 import { haloProducts } from "./brands/halo";
 import { freundProducts } from "./brands/freund";
 import { leidexProducts } from "./brands/leidex";
+import { gelkoProducts } from "./brands/gelko"; // ✅ 1. 新增匯入
 
 /**
  * 產品資料型別定義
@@ -14,7 +15,7 @@ export interface Product {
   category: string;
   name: string;
   name_zh: string;
-  image?: string; // 💡 關鍵修正：加入 image 屬性，解決編譯錯誤
+  image?: string; 
   series?: string; 
   tags: string[];
   /** * AI 搜尋關鍵字：用於存放型號變體、應用領域、同義詞等
@@ -40,6 +41,7 @@ const rawProducts: Product[] = [
   ...haloProducts,
   ...freundProducts,
   ...leidexProducts,
+  ...gelkoProducts, // ✅ 2. 加入 GELKO 產品清單
 ];
 
 /**

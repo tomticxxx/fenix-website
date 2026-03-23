@@ -21,6 +21,10 @@ const brandConfigs: { [key: string]: { color: string, bg: string, border: string
     color: "text-orange-600", bg: "bg-orange-50", border: "border-orange-600", 
     btn: "bg-orange-600", shadow: "shadow-orange-900/10" 
   },
+  "GELKO": { 
+    color: "text-slate-700", bg: "bg-slate-100", border: "border-slate-700", 
+    btn: "bg-slate-700", shadow: "shadow-slate-900/10" 
+  }, // ✅ 已同步為鈦金灰色
   "韓國 LEIDEX": { 
     color: "text-pink-600", bg: "bg-pink-50", border: "border-pink-600", 
     btn: "bg-pink-600", shadow: "shadow-pink-900/10" 
@@ -43,7 +47,6 @@ export default function AISearch() {
         const allProducts = (products as Product[]) || [];
         
         const filtered = allProducts.filter(p => {
-          // 1. 正規化基礎欄位
           const nameZh = normalize(p.name_zh || "");
           const nameEn = normalize(p.name || "");
           const brand = normalize(p.brand || "");
@@ -51,14 +54,10 @@ export default function AISearch() {
           const description = p.description?.toLowerCase() || "";
           const series = p.series ? normalize(p.series) : "";
           
-          // 2. 處理新增的 searchKeywords 欄位
           const keywordsMatch = p.searchKeywords ? normalize(p.searchKeywords).includes(normalizedQuery) : false;
-
-          // 3. 標籤比對 (在 data/products.ts 中我們已經把 models 整合進 tags 了)
           const tagsMatch = p.tags?.some(tag => normalize(tag).includes(normalizedQuery)) || false;
-          
-          // 4. 其他細節比對
           const featuresMatch = p.features?.some(f => normalize(f).includes(normalizedQuery)) || false;
+          
           const appMatch = Array.isArray(p.application) 
             ? p.application.some(a => normalize(a).includes(normalizedQuery))
             : normalize(p.application || "").includes(normalizedQuery);
@@ -78,7 +77,7 @@ export default function AISearch() {
             featuresMatch ||
             appMatch ||
             specsMatch ||
-            keywordsMatch // 👈 支援您新加的關鍵字欄位
+            keywordsMatch
           );
         });
         
@@ -101,7 +100,7 @@ export default function AISearch() {
           <input
             type="text"
             className="w-full px-6 py-5 bg-white rounded-xl border-none focus:ring-2 focus:ring-blue-500 shadow-inner text-lg outline-none pr-12 text-slate-900 font-medium"
-            placeholder="搜尋設備：如 SV-600、打錠機、FREUND..."
+            placeholder="搜尋設備：如 GK-GSC、打錠機、FREUND..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
@@ -122,7 +121,7 @@ export default function AISearch() {
       <div className="mt-8 space-y-4 min-h-[100px]">
         {isSearching && (
           <div className="flex items-center justify-center space-x-2 text-blue-600 font-bold py-10 animate-pulse">
-            <span className="tracking-widest uppercase text-xs">Fenix AI 正在分析技術資料...</span>
+            <span className="tracking-widest uppercase text-xs">AI 正在分析技術資料...</span>
           </div>
         )}
 
@@ -143,6 +142,7 @@ export default function AISearch() {
                   if (config.border.includes('emerald')) return '#10b981';
                   if (config.border.includes('orange')) return '#f97316';
                   if (config.border.includes('pink')) return '#db2777';
+                  if (config.border.includes('slate')) return '#334155'; // ✅ 新增對 GELKO 鈦金灰色的支援
                   return '#2563eb';
                 };
 
@@ -166,7 +166,6 @@ export default function AISearch() {
                         <p className="text-xs text-slate-400 font-medium italic mb-2 uppercase">{product.name}</p>
                         
                         <div className="flex flex-wrap gap-2 mt-4">
-                          {/* 顯示前 6 個標籤，讓搜尋結果看起來豐富 */}
                           {product.tags?.slice(0, 6).map(tag => (
                             <span key={tag} className={`text-[9px] border px-2 py-0.5 rounded-md font-bold ${config.bg} ${config.color} border-current opacity-75`}>
                               #{tag}
@@ -201,7 +200,7 @@ export default function AISearch() {
           <div className="text-center py-16 bg-white rounded-3xl border-2 border-dashed border-slate-100">
             <div className="text-4xl mb-4">🔬</div>
             <p className="text-slate-800 font-bold">未找到匹配設備</p>
-            <p className="text-slate-400 text-sm mt-2">請嘗試搜尋型號、品牌或製程關鍵字（如：膜衣、打錠）</p>
+            <p className="text-slate-400 text-sm mt-2">請嘗試搜尋型號、品牌或製程關鍵字（如：GK-GSC、無縫膠囊）</p>
             <Link href="/contact" className="inline-block mt-6 px-6 py-2 bg-blue-50 text-blue-600 rounded-full text-xs font-bold hover:bg-blue-600 hover:text-white transition-all">
               聯繫技術顧問 →
             </Link>
