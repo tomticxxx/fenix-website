@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Script from "next/script"; // 引入 Next.js 腳本組件
+import Script from "next/script";
 
-// 1. 引入導覽列組件
+// 1. 引入組件
 import Navbar from "../components/Navbar";
-// 2. 引入新的人工客服組件
+import Footer from "../components/Footer"; // 👈 新增：引入 Footer 組件
 import FloatingConcierge from "../components/FloatingConcierge";
 
 const geistSans = Geist({
@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// 3. 修改網站顯示的名稱與描述 (維持專業感)
+// 網站元數據設定
 export const metadata: Metadata = {
   title: "元堉企業 FENIX ENTERPRISE | 專業製藥與彩妝設備領航者",
   description: "代理日、韓、中頂尖製藥與彩妝設備。憑藉 EE 電機電子背景，提供從軟膠囊製造、高精度檢重到自動化產線的專業技術服務。",
@@ -52,7 +52,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased font-sans`}
       >
-        {/* 5. 把 Navbar 放在最上面 */}
+        {/* 導覽列 */}
         <Navbar />
         
         {/* 頁面主要內容 */}
@@ -60,7 +60,10 @@ export default function RootLayout({
           {children}
         </main>
 
-        {/* 6. 加入人工客服引導組件 */}
+        {/* 底部資訊欄 - 放置在內容之後 */}
+        <Footer /> 
+
+        {/* 人工客服引導組件 */}
         <FloatingConcierge />
       </body>
     </html>
