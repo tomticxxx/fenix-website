@@ -1,25 +1,50 @@
 "use client";
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import emailjs from '@emailjs/browser';
 
 export default function ContactPage() {
   const formRef = useRef<HTMLFormElement>(null);
   const [status, setStatus] = useState("");
+  const [isMobile, setIsMobile] = useState(false);
   const address = "106台北市大安區忠孝東路四段169號12樓之4";
+
+  // 偵測裝置類型
+  useEffect(() => {
+    const checkMobile = () => {
+      const userAgent = typeof navigator === "undefined" ? "" : navigator.userAgent;
+      const mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+      setIsMobile(mobile);
+    };
+    checkMobile();
+  }, []);
+
+  // 優化後的 LINE 處理函式
+  const handleOpenLineQR = (e: React.MouseEvent) => {
+    const lineUrl = "https://line.me/ti/p/~@141vwved";
+    
+    if (isMobile) {
+      // 如果是手機，允許 <a> 標籤預設行為跳轉（或手動跳轉）
+      // 這裡直接用 window.location 確保穩定性
+      window.location.href = lineUrl;
+      e.preventDefault();
+    } else {
+      // 如果是電腦，阻擋跳轉並開啟 QR Code 彈窗
+      e.preventDefault();
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("open-line-qr"));
+      }
+    }
+  };
 
   const sendEmail = (e: React.FormEvent) => {
     e.preventDefault();
     setStatus("sending");
 
-    // ======================================================
-    // 💡 提醒：請記得將下方的 TEMPLATE_ID 與 PUBLIC_KEY 填入
-    // ======================================================
     const SERVICE_ID = "service_x4hiwml"; 
     const TEMPLATE_ID = "template_12mz6a4"; 
     const PUBLIC_KEY = "p5QMMQNx4Xd4Dwt58";
-    // ======================================================
 
     if (formRef.current) {
       emailjs.sendForm(SERVICE_ID, TEMPLATE_ID, formRef.current, PUBLIC_KEY)
@@ -41,34 +66,38 @@ export default function ContactPage() {
       title: "台北總部", 
       details: [address], 
       action: "地圖導航", 
-      link: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}` 
+      link: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`,
+      isLine: false
     },
     { 
       icon: "📞", 
       title: "電話聯繫", 
       details: ["(02) 2751-2786", "週一至週五 09:00-18:00"], 
       action: "立即撥打", 
-      link: "tel:0227512786" 
+      link: "tel:0227512786",
+      isLine: false
     },
     { 
       icon: "💬", 
       title: "LINE 詢問", 
-      details: ["ID: @tomticxxx", "專業技術窗口"], 
+      details: ["ID: @141vwved", "專業技術窗口"], 
       action: "加入好友", 
-      link: "https://line.me/ti/p/~tomticxxx" 
+      link: "https://line.me/ti/p/~@141vwved", 
+      isLine: true 
     },
     { 
       icon: "✉️", 
       title: "電子郵件", 
       details: ["fenixco@gmail.com", "24h 內回覆"], 
       action: "發送郵件", 
-      link: "mailto:fenixco@gmail.com" 
+      link: "mailto:fenixco@gmail.com",
+      isLine: false
     }
   ];
 
   return (
     <div className="min-h-screen bg-slate-50 py-16 px-4 relative overflow-hidden">
-      {/* 背景裝飾 Logo (需確保 public/logo.png 存在) */}
+      {/* 背景裝飾 Logo */}
       <div className="absolute -right-20 -bottom-20 w-[600px] h-[600px] opacity-[0.03] animate-blob pointer-events-none">
         <Image src="/logo.png" alt="" fill className="object-contain" />
       </div>
@@ -88,8 +117,9 @@ export default function ContactPage() {
             <a 
               key={index} 
               href={method.link} 
-              target="_blank" 
+              target={method.isLine ? "_self" : "_blank"} 
               rel="noopener noreferrer" 
+              onClick={method.isLine ? handleOpenLineQR : undefined}
               className="group bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all animate-fadeInUp"
               style={{ animationDelay: `${index * 100}ms` }}
             >
@@ -106,7 +136,7 @@ export default function ContactPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-          {/* 左側地圖：精確圖標標註 */}
+          {/* 左側地圖 */}
           <div className="h-[500px] rounded-[2.5rem] overflow-hidden border-8 border-white shadow-xl">
             <iframe 
               src={`https://maps.google.com/maps?q=${encodeURIComponent(address)}&t=&z=16&ie=UTF8&iwloc=&output=embed`}

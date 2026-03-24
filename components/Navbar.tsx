@@ -1,15 +1,43 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
 export default function Navbar() {
   // 控制手機版選單開關的狀態
   const [isOpen, setIsOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // 偵測是否為行動裝置
+  useEffect(() => {
+    const checkMobile = () => {
+      const userAgent = typeof navigator === "undefined" ? "" : navigator.userAgent;
+      const mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+      setIsMobile(mobile);
+    };
+    checkMobile();
+  }, []);
 
   // 點擊選項後自動關閉選單
   const closeMenu = () => setIsOpen(false);
+
+  // 觸發 LINE 動作
+  const handleOpenLineQR = () => {
+    const lineUrl = "https://line.me/ti/p/~@141vwved";
+
+    if (isMobile) {
+      // 如果是手機，直接跳轉加好友
+      window.location.href = lineUrl;
+      closeMenu();
+    } else {
+      // 如果是電腦，觸發 FloatingConcierge 的 QR Code 彈窗
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("open-line-qr"));
+        closeMenu(); 
+      }
+    }
+  };
 
   return (
     <nav className="bg-white border-b sticky top-0 z-50 shadow-sm">
@@ -46,22 +74,20 @@ export default function Navbar() {
             聯絡我們
           </Link>
           
-          {/* 電腦版導航列的 LINE 按鈕 - 保留作為快速入口 */}
-          <a 
-            href="https://line.me/ti/p/~tomticxxx" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="bg-[#06C755] text-white px-5 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 hover:opacity-90 transition-all shadow-md active:scale-95"
+          {/* 電腦版 LINE 按鈕 */}
+          <button 
+            onClick={handleOpenLineQR}
+            className="bg-[#06C755] text-white px-5 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 hover:opacity-90 transition-all shadow-md active:scale-95 border-none cursor-pointer"
           >
             <span className="text-lg">💬</span> LINE 詢問
-          </a>
+          </button>
         </div>
 
         {/* 手機版選單開關按鈕 */}
         <div className="md:hidden flex items-center">
           <button 
             onClick={() => setIsOpen(!isOpen)}
-            className="text-slate-500 p-2 text-3xl focus:outline-none transition-colors hover:text-blue-600"
+            className="text-slate-500 p-2 text-3xl focus:outline-none transition-colors hover:text-blue-600 bg-transparent border-none"
           >
             {isOpen ? '✕' : '☰'}
           </button>
@@ -85,15 +111,13 @@ export default function Navbar() {
               聯絡我們
             </Link>
             
-            <a 
-              href="https://line.me/ti/p/~tomticxxx" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              onClick={closeMenu}
-              className="bg-[#06C755] text-white p-4 rounded-2xl text-center text-lg font-bold shadow-lg flex items-center justify-center gap-3 active:scale-95 transition-transform"
+            {/* 手機版 LINE 按鈕 - 根據偵測結果決定動作 */}
+            <button 
+              onClick={handleOpenLineQR}
+              className="bg-[#06C755] text-white p-4 rounded-2xl text-center text-lg font-bold shadow-lg flex items-center justify-center gap-3 active:scale-95 transition-transform border-none w-full"
             >
               <span className="text-2xl">💬</span> 立即 LINE 詢問
-            </a>
+            </button>
           </div>
         </div>
       )}
