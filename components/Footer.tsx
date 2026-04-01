@@ -1,6 +1,33 @@
+'use client';
+
 import Link from "next/link";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Footer() {
+  const [clickCount, setClickCount] = useState(0);
+  const router = useRouter();
+
+  // 隱形暗門觸發邏輯
+  const handleSecretClick = () => {
+    const newCount = clickCount + 1;
+    setClickCount(newCount);
+
+    // 設定連點 3 下觸發跳轉
+    if (newCount >= 3) {
+      router.push('/portal');
+      setClickCount(0);
+    }
+  };
+
+  // 安全機制：3秒後自動重置點擊次數，防止長時間累積誤觸
+  useEffect(() => {
+    if (clickCount > 0) {
+      const timer = setTimeout(() => setClickCount(0), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [clickCount]);
+
   return (
     <footer className="bg-slate-900 text-slate-500 py-10 px-6 border-t border-slate-800 font-sans">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-y-10 md:gap-x-8">
@@ -26,7 +53,7 @@ export default function Footer() {
         </div>
         
         {/* 中間：快速連結 */}
-        <div className="md:pl-6">
+        <div className="hidden md:block md:pl-6">
           <h4 className="text-white font-bold mb-5 text-xs uppercase tracking-[0.2em]">快速連結</h4>
           <ul className="space-y-3.5 text-xs">
             <li>
@@ -42,11 +69,6 @@ export default function Footer() {
             <li>
               <Link href="/contact" className="hover:text-blue-400 transition-colors flex items-center gap-2">
                 <span className="text-[8px] opacity-30">▶</span> 索取技術文件
-              </Link>
-            </li>
-            <li>
-              <Link href="/privacy" className="hover:text-blue-400 transition-colors flex items-center gap-2 opacity-60">
-                <span className="text-[8px]">§</span> 隱私權保護政策
               </Link>
             </li>
           </ul>
@@ -77,11 +99,27 @@ export default function Footer() {
         </div>
       </div>
       
-      {/* 底部：最小化版權 */}
-      <div className="max-w-7xl mx-auto border-t border-slate-800/50 mt-12 pt-6">
-        <p className="text-[10px] tracking-[0.15em] opacity-30 uppercase text-center md:text-left">
-          © 2026 FENIX ENTERPRISE CO., LTD. ALL RIGHTS RESERVED.
-        </p>
+      {/* 底部：版權宣告與隱私權 */}
+      <div className="max-w-7xl mx-auto border-t border-slate-800/50 mt-12 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="flex flex-col md:flex-row items-center gap-2 md:gap-6">
+          <p className="text-[10px] tracking-[0.15em] opacity-30 uppercase select-none">
+            © 2026 FENIX ENTERPRISE CO., LTD
+            <span 
+              onClick={handleSecretClick}
+              className="cursor-default px-1" // 寬度極小，僅點擊最後一個點有效
+            >
+              .
+            </span>
+          </p>
+          <Link href="/privacy" className="text-[10px] text-slate-500 hover:text-blue-400 transition-colors underline decoration-slate-800 underline-offset-4">
+            隱私權保護政策 Privacy Policy
+          </Link>
+        </div>
+        
+        {/* 標語 */}
+        <span className="text-[10px] text-slate-600 font-medium tracking-[0.3em] uppercase hidden md:block">
+          Professional · Integrity · Engineering
+        </span>
       </div>
     </footer>
   );
