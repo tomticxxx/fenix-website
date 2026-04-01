@@ -9,9 +9,9 @@ export default function FloatingConcierge() {
   const [isOpen, setIsOpen] = useState(false);
   const [showPrompt, setShowPrompt] = useState(false);
   const [view, setView] = useState<"menu" | "form" | "success">("menu");
-  const [isAlexVisible, setIsAlexVisible] = useState(true);
+  const [isTomVisible, setIsTomVisible] = useState(true);
   const [isSending, setIsSending] = useState(false);
-  const [isMobile, setIsMobile] = useState(false); // 新增：狀態管理
+  const [isMobile, setIsMobile] = useState(false);
   
   // 表單狀態管理
   const [formData, setFormData] = useState({
@@ -22,7 +22,7 @@ export default function FloatingConcierge() {
     email: "",
   });
 
-  // 控制 LINE QR Code 彈窗顯隱 (電腦版使用)
+  // 控制 LINE QR Code 彈窗顯隱
   const [showLineQR, setShowLineQR] = useState(false);
 
   useEffect(() => {
@@ -34,7 +34,7 @@ export default function FloatingConcierge() {
     };
     checkMobile();
 
-    // 2. 初始提示計時器
+    // 2. 初始提示計時器 (4秒後彈出小提示)
     const timer = setTimeout(() => {
       if (!isOpen) setShowPrompt(true);
     }, 4000);
@@ -43,14 +43,14 @@ export default function FloatingConcierge() {
       // 3. Crisp 聊天室連動
       window.$crisp?.push(["on", "chat:closed", () => {
         window.$crisp.push(["do", "chat:hide"]); 
-        setIsAlexVisible(true); 
+        setIsTomVisible(true); 
       }]);
 
       window.$crisp?.push(["on", "chat:opened", () => {
-        setIsAlexVisible(false); 
+        setIsTomVisible(false); 
       }]);
 
-      // 4. 接聽外部觸發 LINE 事件 (例如從頁面按鈕觸發)
+      // 4. 接聽外部觸發 LINE 事件
       const handleRemoteOpenQR = () => {
         handleLineAction();
       };
@@ -77,26 +77,21 @@ export default function FloatingConcierge() {
       window.$crisp.push(['do', 'chat:show']);
       window.$crisp.push(['do', 'chat:open']);
       setIsOpen(false);
-      setIsAlexVisible(false);
+      setIsTomVisible(false);
     }
   };
 
-  // 處理 LINE 行動邏輯：判斷裝置跳轉或顯示 QR Code
   const handleLineAction = () => {
     const lineUrl = "https://line.me/ti/p/~@141vwved";
-    
     if (isMobile) {
-      // 手機版：直接跳轉喚起 LINE
       window.location.href = lineUrl;
     } else {
-      // 電腦版：維持原樣顯示彈窗
       setShowLineQR(true);
       setIsOpen(false);
       setShowPrompt(false);
     }
   };
 
-  // 處理詢價信發送
   const handleSendInquiry = async () => {
     if (!formData.name || !formData.email || !formData.model) {
       alert("請至少填寫姓名、電子郵件與設備需求內容。");
@@ -115,7 +110,7 @@ export default function FloatingConcierge() {
       user_email: formData.email,
       user_phone: formData.phone,
       message: `【設備型號/需求】：${formData.model}`,
-      source: "來自 Alex AI 助手 (Floating Widget)"
+      source: "來自 Tom 技術顧問助手 (Floating Widget)"
     };
 
     try {
@@ -123,14 +118,13 @@ export default function FloatingConcierge() {
       setView("success");
       setFormData({ model: "", company: "", name: "", phone: "", email: "" });
     } catch (error) {
-      console.error("Alex 發送失敗:", error);
+      console.error("Tom 訊息發送失敗:", error);
       alert("發送失敗，請直接使用 LINE 或電話聯繫。");
     } finally {
       setIsSending(false);
     }
   };
 
-  // 核心行動選項
   const actions = [
     { 
       label: "網頁即時諮詢", 
@@ -140,7 +134,7 @@ export default function FloatingConcierge() {
     { 
       label: "LINE 專人對答", 
       icon: "🟢", 
-      onClick: handleLineAction // 使用優化後的邏輯
+      onClick: handleLineAction 
     },
     { 
       label: "技術規格 / 詢價", 
@@ -153,13 +147,14 @@ export default function FloatingConcierge() {
     <>
       <div className="fixed bottom-8 right-8 z-[9999] flex flex-col items-end font-sans">
         <AnimatePresence>
-          {isAlexVisible && isOpen && (
+          {isTomVisible && isOpen && (
             <motion.div
               initial={{ opacity: 0, y: 20, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 20, scale: 0.95 }}
               className="mb-4 w-80 bg-white rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-slate-100 overflow-hidden"
             >
+              {/* Header */}
               <div className="bg-gradient-to-br from-slate-900 to-blue-900 p-8 text-white relative">
                 <button onClick={toggleOpen} className="absolute top-4 right-4 text-white/50 hover:text-white transition-colors border-none bg-transparent cursor-pointer">
                   <X className="w-5 h-5" />
@@ -167,24 +162,25 @@ export default function FloatingConcierge() {
                 <div className="flex flex-col items-center text-center">
                   <div className="relative mb-3">
                     <div className="w-32 h-32 rounded-full border-4 border-white/20 shadow-2xl overflow-hidden bg-slate-800 relative">
-                      <Image src="/concierge-avatar.png" alt="Alex Avatar" fill className="object-cover scale-110" priority unoptimized />
+                      <Image src="/concierge-avatar.png" alt="Tom Avatar" fill className="object-cover scale-110" priority unoptimized />
                     </div>
                     <div className="absolute bottom-2 right-3 w-6 h-6 bg-emerald-500 border-4 border-slate-900 rounded-full">
                       <div className="w-full h-full bg-emerald-400 rounded-full animate-ping opacity-75"></div>
                     </div>
                   </div>
-                  <h3 className="text-xl font-bold tracking-tight">元堉技術顧問 Alex</h3>
+                  <h3 className="text-xl font-bold tracking-tight">元堉技術顧問 Tom</h3>
                   <p className="text-blue-300 text-[10px] font-black tracking-[0.2em] uppercase mt-1 opacity-80">EE Technical Advisor</p>
                 </div>
               </div>
 
+              {/* Content Area */}
               <div className="p-6 bg-slate-50 min-h-[300px]">
                 <AnimatePresence mode="wait">
                   {view === "menu" && (
                     <motion.div key="menu" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }}>
                       <div className="bg-white p-4 rounded-2xl rounded-tl-none shadow-sm border border-slate-100 mb-6 relative">
                         <p className="text-sm text-slate-700 leading-relaxed font-semibold">
-                          您好！我是 Alex。如果您在尋找特定的製藥設備或有技術規格需求，請隨時告訴我。
+                          您好！我是 Tom。如果您在尋找特定的製藥設備或有任何技術規格需求，請隨時告訴我。
                         </p>
                         <div className="absolute top-0 -left-2 w-3 h-3 bg-white [clip-path:polygon(100%_0,100%_100%,0_0)]"></div>
                       </div>
@@ -227,7 +223,7 @@ export default function FloatingConcierge() {
                         <CheckCircle2 size={32} />
                       </div>
                       <h4 className="font-bold text-slate-800 italic text-lg">Thank You!</h4>
-                      <p className="text-sm text-slate-500 mt-2 font-medium">需求已送出，Alex 將儘速回覆您的 Gmail。</p>
+                      <p className="text-sm text-slate-500 mt-2 font-medium">需求已送出，Tom 將儘速透過 Email 回覆您。</p>
                       <button onClick={() => setView("menu")} className="mt-8 text-sm text-blue-600 font-bold hover:underline bg-transparent border-none cursor-pointer">回到主選單</button>
                     </motion.div>
                   )}
@@ -238,17 +234,19 @@ export default function FloatingConcierge() {
           )}
         </AnimatePresence>
 
+        {/* Floating Bubble Prompt */}
         <AnimatePresence>
-          {isAlexVisible && showPrompt && !isOpen && (
+          {isTomVisible && showPrompt && !isOpen && (
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} onClick={() => { setIsOpen(true); setShowPrompt(false); }} className="mb-4 bg-blue-600 text-white py-3 px-6 rounded-2xl rounded-br-none shadow-2xl cursor-pointer hover:bg-blue-500 transition-colors relative">
-              <p className="text-sm font-black tracking-tight flex items-center gap-2">有設備需求？點我諮詢 Alex 👨‍🔧</p>
+              <p className="text-sm font-black tracking-tight flex items-center gap-2">有設備需求？點我諮詢 Tom 👨‍🔧</p>
               <div className="absolute -bottom-2 right-0 w-4 h-4 bg-blue-600 [clip-path:polygon(100%_0,0_0,100%_100%)]"></div>
             </motion.div>
           )}
         </AnimatePresence>
 
+        {/* Main Floating Button */}
         <AnimatePresence>
-          {isAlexVisible && (
+          {isTomVisible && (
             <motion.button initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0 }} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={toggleOpen} className={`w-16 h-16 rounded-full flex items-center justify-center shadow-2xl transition-all duration-500 border-none cursor-pointer ${isOpen ? 'bg-slate-900 rotate-90' : 'bg-blue-600'}`}>
               {isOpen ? <X className="text-white w-8 h-8" /> : <MessageCircle className="text-white w-8 h-8" />}
             </motion.button>
@@ -256,7 +254,7 @@ export default function FloatingConcierge() {
         </AnimatePresence>
       </div>
 
-      {/* --- 全螢幕 LINE QR Code 彈窗 (僅電腦版顯現) --- */}
+      {/* LINE QR Code Overlay */}
       <AnimatePresence>
         {showLineQR && (
           <motion.div 
@@ -275,7 +273,7 @@ export default function FloatingConcierge() {
               <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <QrCode size={32} />
               </div>
-              <h3 className="text-2xl font-black text-slate-800 mb-2 italic tracking-tight">Add Alex on LINE</h3>
+              <h3 className="text-2xl font-black text-slate-800 mb-2 italic tracking-tight">Add Tom on LINE</h3>
               <p className="text-sm text-slate-500 mb-8 font-medium">掃描 QR Code 獲取藥機報價與技術手冊<br/><span className="text-blue-600 font-bold underline">Official ID: @141vwved</span></p>
               
               <div className="bg-white p-4 rounded-3xl mb-8 shadow-inner border border-slate-100 inline-block relative overflow-hidden group">
@@ -296,7 +294,7 @@ export default function FloatingConcierge() {
   );
 }
 
-function MenuButton({ action }: { action: any }) {
+function MenuButton({ action }: { action: { label: string; icon: string | React.ReactNode; onClick: () => void } }) {
   return (
     <motion.div
       whileHover={{ x: 5, backgroundColor: "#f1f5f9" }}
