@@ -4,12 +4,13 @@ import React, { useState, useEffect } from 'react';
 import { products, Product } from '../data/products';
 import Link from 'next/link';
 
+// 品牌配置配色 - 確保與全站視覺統一
 const brandConfigs: { [key: string]: { color: string, bg: string, border: string, btn: string, shadow: string } } = {
   "SKY SOFTGEL": { 
     color: "text-blue-600", bg: "bg-blue-50", border: "border-blue-600", 
     btn: "bg-blue-600", shadow: "shadow-blue-900/10" 
   },
-  "翰林航宇": { 
+  "中國指標品牌": { 
     color: "text-red-600", bg: "bg-red-50", border: "border-red-600", 
     btn: "bg-red-600", shadow: "shadow-red-900/10" 
   },
@@ -21,10 +22,14 @@ const brandConfigs: { [key: string]: { color: string, bg: string, border: string
     color: "text-orange-600", bg: "bg-orange-50", border: "border-orange-600", 
     btn: "bg-orange-600", shadow: "shadow-orange-900/10" 
   },
+  "RGS (Italy)": { 
+    color: "text-fuchsia-600", bg: "bg-fuchsia-50", border: "border-fuchsia-600", 
+    btn: "bg-fuchsia-600", shadow: "shadow-fuchsia-900/10" 
+  },
   "GELKO": { 
     color: "text-slate-700", bg: "bg-slate-100", border: "border-slate-700", 
     btn: "bg-slate-700", shadow: "shadow-slate-900/10" 
-  }, // ✅ 已同步為鈦金灰色
+  },
   "韓國 LEIDEX": { 
     color: "text-pink-600", bg: "bg-pink-50", border: "border-pink-600", 
     btn: "bg-pink-600", shadow: "shadow-pink-900/10" 
@@ -35,6 +40,12 @@ export default function AISearch() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Product[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+
+  // 格式化顯示名稱：將資料庫中的「翰林」標籤轉換為「中國指標品牌」
+  const formatDisplayBrand = (brand: string) => {
+    if (brand.includes("翰林") || brand.includes("Hanlom")) return "中國指標品牌";
+    return brand;
+  };
 
   // 強化搜尋邏輯：移除符號，實現 SV-600 = SV600
   const normalize = (str: string) => str.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]/g, '');
@@ -100,7 +111,7 @@ export default function AISearch() {
           <input
             type="text"
             className="w-full px-6 py-5 bg-white rounded-xl border-none focus:ring-2 focus:ring-blue-500 shadow-inner text-lg outline-none pr-12 text-slate-900 font-medium"
-            placeholder="搜尋設備：如 GK-GSC、打錠機、FREUND..."
+            placeholder="搜尋設備：如 GK-GSC、打錠機、RGS 真空輸送..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
@@ -132,17 +143,20 @@ export default function AISearch() {
             </p>
             <div className="space-y-4">
               {results.map((product) => {
-                const config = brandConfigs[product.brand] || { 
+                const displayBrand = formatDisplayBrand(product.brand);
+                const config = brandConfigs[displayBrand] || { 
                   color: "text-blue-600", bg: "bg-blue-50", border: "border-blue-600", btn: "bg-blue-600" 
                 };
 
+                // 直接從 border 字串判斷顏色值
                 const getBorderColor = () => {
                   if (config.border.includes('blue')) return '#2563eb';
                   if (config.border.includes('red')) return '#dc2626';
                   if (config.border.includes('emerald')) return '#10b981';
                   if (config.border.includes('orange')) return '#f97316';
+                  if (config.border.includes('fuchsia')) return '#c026d3'; // RGS
                   if (config.border.includes('pink')) return '#db2777';
-                  if (config.border.includes('slate')) return '#334155'; // ✅ 新增對 GELKO 鈦金灰色的支援
+                  if (config.border.includes('slate')) return '#334155';
                   return '#2563eb';
                 };
 
@@ -156,7 +170,7 @@ export default function AISearch() {
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
                           <span className={`text-[10px] font-black text-white px-2 py-0.5 rounded tracking-tighter uppercase ${config.btn}`}>
-                            {product.brand}
+                            {displayBrand}
                           </span>
                           <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{product.category}</span>
                         </div>
