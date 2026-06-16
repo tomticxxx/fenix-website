@@ -73,6 +73,14 @@ export default function Navbar() {
           <Link href="/contact" className="hover:text-blue-600 transition-colors text-sm">
             聯絡我們
           </Link>
+
+          {/* 【新增】電腦版 2026 生技展覽專頁常駐入口 (醒目橘色按鈕) */}
+          <Link 
+            href="/bio-asia-2026"
+            className="text-orange-600 bg-orange-50 px-3 py-1.5 rounded-lg text-sm border border-orange-200 hover:bg-orange-500 hover:text-white transition-all shadow-sm flex items-center gap-1"
+          >
+            <span>🔥</span> 2026 展覽專頁
+          </Link>
           
           {/* 電腦版 LINE 按鈕 */}
           <button 
@@ -109,6 +117,15 @@ export default function Navbar() {
             </Link>
             <Link href="/contact" onClick={closeMenu} className="text-lg hover:text-blue-600 border-b border-slate-50 pb-2">
               聯絡我們
+            </Link>
+
+            {/* 【新增】手機版 2026 生技展覽專頁入口 */}
+            <Link 
+              href="/bio-asia-2026" 
+              onClick={closeMenu} 
+              className="text-lg text-orange-600 bg-orange-50 p-3 rounded-xl flex justify-between items-center border border-orange-200"
+            >
+              2026 生技大展專頁 <span>🔥</span>
             </Link>
             
             {/* 手機版 LINE 按鈕 - 根據偵測結果決定動作 */}

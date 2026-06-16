@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+// @ts-ignore：強制跳過 CSS 檔案的型別宣告檢查，徹底消除 TS(2882) 紅字
 import "./globals.css";
 import Script from "next/script";
 
@@ -8,6 +9,8 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import FloatingConcierge from "../components/FloatingConcierge";
 import ClientLayoutWrapper from "../components/ClientLayoutWrapper";
+// 引入展覽彈出視窗組件
+import BioAsiaPopup from "../components/BioAsiaPopup";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -59,6 +62,9 @@ export default function RootLayout({
         >
           <main className="min-h-screen">
             {children}
+            
+            {/* 塞在 main 裡面、children 的最下方，確保百分之百被載入並執行 */}
+            <BioAsiaPopup />
           </main>
         </ClientLayoutWrapper>
       </body>

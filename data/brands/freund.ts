@@ -1,16 +1,17 @@
+// brands/freund.ts
 import { Product } from "../products";
 
 export const freundProducts: Product[] = [
   // 1. VFC 實驗室系列
   {
-    id: "freund-vfc-lab",
+    id: "freund-vfc-lab", // 保持小寫
     brand: "日本 FREUND",
     category: "流體床造粒乾燥機",
     series: "VFC FLO-COATER® (Lab)",
     name: "Laboratory Series Fluid Beds",
     name_zh: "實驗室型流體床造粒乾燥機",
     description: "VFC-LAB 系列是極具彈性的研發級系統。具備標準乾燥、頂噴與底噴功能。其獨特設計將產品容器與 Wurster 插件整合，結合專利 GRANUREX® 技術，無須額外組件即可實現快速切換與清洗。",
-    tags: ["實驗研發型", "造粒", "乾燥", "包衣", "Wurster", "GRANUREX"],
+    tags: ["實驗研發型", "造粒", "乾燥", "包衣", "Wurster", "GRANUREX", "日本原廠代理"],
     features: [
       "Flexible Configurations: 靈活的頂噴、底噴與轉盤配置",
       "Removable Cartridge Filters: 可拆卸式濾筒設計",
@@ -43,7 +44,7 @@ export const freundProducts: Product[] = [
     name: "Production Series Fluid Beds",
     name_zh: "量產型流體床造粒乾燥機",
     description: "VFC 生產型系統採用模組化設計，確保驗證程序精簡化。能執行乾燥、造粒、包衣、層疊 (Layering) 與球化 (Spheronize)。",
-    tags: ["大型量產型", "自動化", "大容量"],
+    tags: ["大型量產型", "自動化", "大容量", "GMP 規範"],
     features: [
       "Optimized Geometries: 最佳化幾何結構設計",
       "Non-Inflatable Seal Design: 非充氣式密封設計",
@@ -73,7 +74,7 @@ export const freundProducts: Product[] = [
     ]
   },
 
-  // 3. Granurex 系列 (依據 PDF 新增)
+  // 3. Granurex 系列
   {
     id: "freund-granurex",
     brand: "日本 FREUND",
@@ -82,7 +83,7 @@ export const freundProducts: Product[] = [
     name: "Multi-Functional Rotor Processor",
     name_zh: "多功能轉盤造粒機",
     description: "進化型 All-in-One 系統，單一設備即可完成從濕式造粒到乾燥的全過程。採用專利錐形轉盤 (Conical Rotor) 與 Slit Air 技術，能產出粒徑分佈極其均勻且高密度的球形顆粒，並支援粉末或微顆粒的精密包衣。",
-    tags: ["多功能", "轉盤造粒", "精密包衣", "高效乾燥"],
+    tags: ["多功能", "轉盤造粒", "精密包衣", "高效乾燥", "DDS劑型"],
     features: [
       "Conical Rotor: 獨特錐形轉盤設計，產生動態粒子運動並提高產能",
       "Slit Air: 均勻空氣分佈確保包衣均勻度並防止結塊",
@@ -151,7 +152,7 @@ export const freundProducts: Product[] = [
     name: "Tablet Coating System",
     name_zh: "高效能包衣機",
     description: "全球領先的全多孔轉鼓包衣系統，結合先進噴霧技術與可換式擋板，確保各種包衣需求的高效穩定。",
-    tags: ["糖衣", "膜衣", "全多孔轉鼓"],
+    tags: ["糖衣", "膜衣", "全多孔轉鼓", "膜衣錠"],
     features: [
       "10-100% Capacity Range",
       "Elongated Pans: 提供長型轉鼓選擇",
@@ -184,7 +185,7 @@ export const freundProducts: Product[] = [
     name: "Roll Compactor",
     name_zh: "乾式造粒機",
     description: "連續式直接壓縮系統，使用單錐形垂直螺桿送料，顯著改善物料流動性並最小化細粉率。",
-    tags: ["乾式造粒", "滾壓", "熱敏感"],
+    tags: ["乾式造粒", "滾壓", "熱敏感", "直接壓縮"],
     features: [
       "Single Tapered Vertical Screw",
       "Constant Force Design",

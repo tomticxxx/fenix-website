@@ -149,19 +149,47 @@ export default function ContactPage() {
             ></iframe>
           </div>
 
-          {/* 右側詢價表單 */}
+          {/* 右側詢價表單（已導入客製化清晰文字樣式） */}
           <div className="bg-white rounded-[2.5rem] p-10 shadow-xl border border-slate-100">
             <h2 className="text-3xl font-bold mb-2 text-slate-800 tracking-tight">快速詢價表單</h2>
             <p className="text-slate-500 mb-8">請留下您的需求，元堉 EE 技術團隊將竭誠為您服務。</p>
             
             <form ref={formRef} onSubmit={sendEmail} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input type="text" name="user_name" placeholder="您的姓名 *" required className="w-full px-5 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-blue-500 transition-all" />
-                <input type="text" name="company_name" placeholder="公司名稱" className="w-full px-5 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-blue-500 transition-all" />
+                <input 
+                  type="text" 
+                  name="user_name" 
+                  placeholder="您的姓名 *" 
+                  required 
+                  className="w-full px-5 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-blue-500 transition-all text-slate-800 font-medium placeholder-slate-400" 
+                />
+                <input 
+                  type="text" 
+                  name="company_name" 
+                  placeholder="公司名稱" 
+                  className="w-full px-5 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-blue-500 transition-all text-slate-800 font-medium placeholder-slate-400" 
+                />
               </div>
-              <input type="email" name="user_email" placeholder="電子郵件 *" required className="w-full px-5 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-blue-500 transition-all" />
-              <input type="tel" name="user_phone" placeholder="聯絡電話" className="w-full px-5 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-blue-500 transition-all" />
-              <textarea name="message" placeholder="請描述您的設備需求（型號、產能或諮詢項目）" rows={4} required className="w-full px-5 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-blue-500 transition-all resize-none"></textarea>
+              <input 
+                type="email" 
+                name="user_email" 
+                placeholder="電子郵件 *" 
+                required 
+                className="w-full px-5 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-blue-500 transition-all text-slate-800 font-medium placeholder-slate-400" 
+              />
+              <input 
+                type="tel" 
+                name="user_phone" 
+                placeholder="聯絡電話" 
+                className="w-full px-5 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-blue-500 transition-all text-slate-800 font-medium placeholder-slate-400" 
+              />
+              <textarea 
+                name="message" 
+                placeholder="請描述您的設備需求（型號、產能或諮詢項目）" 
+                rows={4} 
+                required 
+                className="w-full px-5 py-3 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:border-blue-500 transition-all resize-none text-slate-800 font-medium placeholder-slate-400"
+              ></textarea>
               
               <button 
                 type="submit" 
