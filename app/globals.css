@@ -1,13 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  /* 基礎背景與文字顏色 */
+  /* 基礎背景與文字顏色（保持清晰專業的亮色調） */
   --background: #ffffff;
   --foreground: #171717;
 
-  /* 補足 Next.js 預設 Geist 字體變數，若沒抓到則自動 fallback 到系統無襯線字體 */
-  --font-geist-sans: "Geist Sans", Arial, Helvetica, sans-serif;
-  --font-geist-mono: "Geist Mono", Courier New, monospace;
+  /* 擴充字體集：完美融合 Next.js Geist 英文與蘋果/微軟繁體中文系統字體 */
+  --font-geist-sans: "Geist Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  --font-geist-mono: "Geist Mono", SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 /* Tailwind v4 主題擴充語法 */
@@ -18,23 +18,17 @@
   --font-mono: var(--font-geist-mono);
 }
 
-/* 系統暗黑模式偵測 */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 /* 全局樣式應用 */
 body {
   background-color: var(--background);
   color: var(--foreground);
-  /* 讓 body 直接套用上面定義好、包含 Geist 的無襯線字體集 */
   font-family: var(--font-geist-sans);
+  /* 抗鋸齒優化，讓中英文字體在螢幕上看起來更細緻平滑 */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* 這是解決換行問題的核心代碼 */
+/* 處理產品規格或說明文字的換行與空白字元 */
 .line-break-text {
   white-space: pre-line;
 }
