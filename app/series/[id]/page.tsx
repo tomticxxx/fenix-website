@@ -36,7 +36,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const series = product.series || product.name || "";
   
   // 🎯 智慧防重複邏輯：避免出現「乾式造粒機 乾式造粒機」重複堆疊
-  // 如果中文品名（nameZh）或型號系列（series）已經包含了分類（category）的關鍵字，則不重複串接
   let displayCategory = category;
   if (
     (nameZh && category && (nameZh.includes(category) || category.includes(nameZh))) ||
@@ -52,10 +51,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const seoTitle = `${productTitleTokens} 台灣官方代理 - Fenix Enterprise 元堉企業`;
   const seoDescription = `元堉企業 (Fenix Enterprise) 專業代理 ${brand} ${series} ${nameZh}。我們提供符合 cGMP/PIC/S 規範之技術諮詢、在地安裝調試、模具變更與原廠售後維修技術支援，歡迎生技製藥食品廠預約商談。`;
 
-  // 🎯 OG 圖片絕對路徑防呆：優先使用產品圖 -> 最底線使用全站 logo.png 頂替，消滅 404
+  // 🎯 網址統一加上 www. 確保權重集中
   const ogImageUrl = product.image 
-    ? `https://fenixmech.com${product.image}`
-    : "https://fenixmech.com/logo.png"; 
+    ? `https://www.fenixmech.com${product.image}`
+    : "https://www.fenixmech.com/logo.png"; 
 
   return {
     title: seoTitle,
@@ -77,7 +76,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title: `${brand} ${series} 台灣總代理 | 元堉企業`,
       description: `了解 ${brand} ${series} ${nameZh} 的專業性能參數、產能規格與在地技術支援。`,
-      url: `https://fenixmech.com/series/${safeId}`,
+      url: `https://www.fenixmech.com/series/${safeId}`,
       images: [
         {
           url: ogImageUrl,
@@ -96,7 +95,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     // 💡 告訴 Google 這是唯一標準網址，避免重複網址分散權重
     alternates: {
-      canonical: `https://fenixmech.com/series/${safeId}`,
+      canonical: `https://www.fenixmech.com/series/${safeId}`,
     }
   };
 }
@@ -111,50 +110,34 @@ export default async function Page({ params }: Props) {
   
   if (!product) return <SeriesDetailClient id={safeId} />;
 
-  // 🎯 OG 圖片絕對路徑防呆（對應下方的 JSON-LD）
+  // 🎯 圖片絕對路徑同步優化 (帶 www.)
   const jsonLdImageUrl = product.image 
-    ? `https://fenixmech.com${product.image}`
-    : "https://fenixmech.com/logo.png";
+    ? `https://www.fenixmech.com${product.image}`
+    : "https://www.fenixmech.com/logo.png";
 
-  // 🎯 主動出擊 2: Schema JSON-LD 升級，明確宣告商務窗口實體為「元堉企業」
+  // 🎯 頂級工業設備目錄化改造：徹底拔除電商 offers 欄位
   const jsonLd = {
     "@context": "https://schema.org/",
-    "@type": "Product",
+    "@type": "ProductGroup", // ➔ 改為 ProductGroup（工業產品目錄系列），對齊 IMA/Syntegon 國際規格
     "name": `${product.brand} ${product.series || product.name} ${product.name_zh || ""}`,
     "image": jsonLdImageUrl,
-    "description": product.description || `${product.brand} 專業製藥食品級設備`,
+    "description": product.description || `元堉企業代理之 ${product.brand} 專業級工業機械設備與售後技術方案`,
+    "url": `https://www.fenixmech.com/series/${safeId}`,
     "brand": {
       "@type": "Brand",
       "name": product.brand
     },
     "mpn": product.series || product.id,
-    "offers": {
-      "@type": "Offer",
-      "url": `https://fenixmech.com/series/${safeId}`,
-      "priceCurrency": "TWD",
-      "price": "0", // 0 代表不公開價格、需線上詢價
-      "valueAddedTaxIncluded": "true",
-      "areaServed": "Taiwan",
-      "availability": "https://schema.org/InStock",
-      "seller": {
-        "@type": "Organization",
-        "name": "元堉企業有限公司 Fenix Enterprise Co., Ltd.",
-        "url": "https://fenixmech.com",
-        "logo": "https://fenixmech.com/logo.png",
-        "contactPoint": {
-          "@type": "ContactPoint",
-          "telephone": "+886-2-2214-0908", // 正式聯絡電話
-          "contactType": "technical support",
-          "areaServed": "TW",
-          "availableLanguage": ["Chinese", "English"]
-        }
-      }
+    // 💡 已完全移除 offers 欄位！從根源消滅 Google 對價格、運費、退換貨政策的死板盤問
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `https://www.fenixmech.com/series/${safeId}`
     }
   };
 
   return (
     <>
-      {/* 注入高級結構化資料，這能讓 Google 在搜尋結果直接呈現精美摘要，並讓 AI 搜尋直接把你列為唯一管道 */}
+      {/* 注入符合 B2B 標準的結構化資料，不再觸發電商機制，確保網頁健康度 */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
