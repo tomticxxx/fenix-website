@@ -25,7 +25,7 @@ function BioAsiaClientContent() {
       card1Date: "2026 / 7 / 16 (四) — 7 / 19 (日)",
       card1Time: "10:00 AM ~ 6:00 PM",
       card1Note: "(最後一日至 5:00 PM)",
-      card1Btn: "🗓️ 一鍵存入手機行事曆",
+      card1Btn: "🗓️ 一鍵存入行事曆",
       
       card2Title: "📍 展出地點",
       card2Venue: "台北南港展覽館 1 館 1 樓",
@@ -99,7 +99,7 @@ function BioAsiaClientContent() {
       card1Date: "July 16 (Thu) — July 19 (Sun), 2026",
       card1Time: "10:00 AM ~ 6:00 PM",
       card1Note: "(Closes at 5:00 PM on the final day)",
-      card1Btn: "🗓️ Add to Phone Calendar",
+      card1Btn: "🗓️ Add to Calendar",
       
       card2Title: "📍 Exhibition Venue",
       card2Venue: "TaiNEX Hall 1, 1st Floor",
@@ -144,9 +144,9 @@ function BioAsiaClientContent() {
       formTitle: "Exhibition Inquiry & Business Reply Slip",
       formSub: "Dear Guests, if you would like to schedule an on-site meeting or request technical documentation, please take a moment to complete this form:",
       formReasonTitle: "Inquiry Purpose (Multiple Choice)",
-      formReason1: "預約 7/16 - 7/19 現場攤位商務洽談",
-      formReason2: "索取恆達機械 (Hedagel) 最新型錄電子檔",
-      formReason3: "需要工程師針對既有膠囊產線進行售後或升級諮詢",
+      formReason1: "Book a dedicated meeting slot during the expo (July 16-19)",
+      formReason2: "Request the latest Hedagel softgel machinery electronic catalog",
+      formReason3: "Require engineering consultation for existing encapsulation line upgrades",
       formReason1Label: "Book a dedicated meeting slot during the expo (July 16-19)",
       formReason2Label: "Request the latest Hedagel softgel machinery electronic catalog",
       formReason3Label: "Require engineering consultation for existing encapsulation line upgrades",
@@ -175,15 +175,58 @@ function BioAsiaClientContent() {
     );
   };
 
-  // 捷徑：一鍵加入 Google 行事曆
+  // 智慧路由分流：一鍵加入行事曆
   const handleAddToCalendar = () => {
-    const eventTitle = encodeURIComponent("2026 亞洲美容保養．生技保健大展 | 恒達机械 K202");
-    const eventDates = "20260716T020000Z/20260719T100000Z"; 
-    const eventDetails = encodeURIComponent("展位編號：K202 (恒達机械)。現場展示頂尖軟膠囊製造技術與核心模具工藝，Fenix 團隊提供全程現場技術支援。");
-    const eventLocation = encodeURIComponent("台北南港展覽館 1 館 1 樓 (國外廠商區), 115台北市南港區經貿二路1號");
+    const rawTitle = "2026 亞洲美容保養．生技保健大展 | 恒達机械 K202";
+    const rawDetails = "展位編號：K202 (恒達机械)。現場展示頂尖軟膠囊製造技術與核心模具工藝，Fenix 團隊提供全程現場技術支援。";
+    const rawLocation = "台北南港展覽館 1 館 1 樓 (國外廠商區), 115台北市南港區經貿二路1號";
     
-    const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${eventTitle}&dates=${eventDates}&details=${eventDetails}&location=${eventLocation}`;
-    window.open(googleCalendarUrl, '_blank');
+    // 展期：2026/07/16 10:00 ~ 2026/07/19 18:00 (台灣時間對應 UTC 02:00 ~ 10:00)
+    const dtStart = "20260716T020000Z";
+    const dtEnd = "20260719T100000Z";
+
+    // 環境偵測：判斷是否為 iOS / iPadOS (包含 iOS 13+ 的 iPad 偽裝桌機偵測)
+    const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : '';
+    const isIOS = /iPad|iPhone|iPod/.test(userAgent) || 
+                  (typeof navigator !== 'undefined' && navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+    if (isIOS) {
+      // 【iOS / iPadOS 解決方案】：封裝標準 ICS 內容至 Blob，由網頁層直接喚醒 iOS 內建月曆字卡
+      const icsContent = [
+        "BEGIN:VCALENDAR",
+        "VERSION:2.0",
+        "PRODID:-//Fenix Enterprise//BioAsia Expo//EN",
+        "BEGIN:VEVENT",
+        `UID:${Date.now()}@fenixmech.com`,
+        `DTSTAMP:20260618T000000Z`,
+        `DTSTART:${dtStart}`,
+        `DTEND:${dtEnd}`,
+        `SUMMARY:${rawTitle}`,
+        `DESCRIPTION:${rawDetails}`,
+        `LOCATION:${rawLocation}`,
+        "END:VEVENT",
+        "END:VCALENDAR"
+      ].join("\r\n");
+
+      const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+      const blobUrl = URL.createObjectURL(blob);
+      
+      // 直接修改 href，iOS 即刻觸發底層行事曆抽屜
+      window.location.href = blobUrl;
+      
+      // 異步釋放暫存記憶體
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 150);
+    } else {
+      // 【Android 與通用桌機解決方案】：直連網頁版 Google 行事曆，不下載實體檔案
+      const eventTitle = encodeURIComponent(rawTitle);
+      const eventDates = `${dtStart}/${dtEnd}`;
+      const eventDetails = encodeURIComponent(rawDetails);
+      const eventLocation = encodeURIComponent(rawLocation);
+      
+      const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${eventTitle}&dates=${eventDates}&details=${eventDetails}&location=${eventLocation}`;
+      
+      window.open(googleCalendarUrl, '_blank');
+    }
   };
 
   // 寄送展覽預約信件邏輯
@@ -248,7 +291,7 @@ function BioAsiaClientContent() {
         {/* 展會核心資訊 */}
         <div className="p-8 border-b border-slate-100">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
-            <div className="p-4 bg-blue-50 rounded-xl flex flex-column justify-between flex-wrap">
+            <div className="p-4 bg-blue-50 rounded-xl flex flex-col justify-between">
               <div className="w-full">
                 <h3 className="text-blue-900 font-bold mb-1">{t.card1Title}</h3>
                 <p className="text-slate-700 font-semibold text-sm sm:text-base">{t.card1Date}</p>
@@ -293,7 +336,7 @@ function BioAsiaClientContent() {
         {/* 平面圖標示與尋找指南 */}
         <div className="p-8 bg-slate-50 border-b border-slate-100">
           <h2 className="text-xl font-bold text-slate-800 mb-3 flex items-center gap-2">
-            🗺️ {t.guideTitle}
+            {t.guideTitle}
           </h2>
           <p className="text-slate-600 text-sm leading-relaxed mb-4">
             {t.guideDesc}
@@ -354,7 +397,7 @@ function BioAsiaClientContent() {
           {/* 專業問答 FAQ 區塊 */}
           <div className="border-t border-slate-100 pt-6">
             <h3 className="text-base font-bold text-slate-800 mb-3 flex items-center gap-1.5">
-              <span className="text-blue-900">💡</span> {t.faqSectionTitle}
+              {t.faqSectionTitle}
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-600 leading-relaxed">
               <div className="bg-slate-50/50 p-3.5 rounded-xl border border-slate-100">

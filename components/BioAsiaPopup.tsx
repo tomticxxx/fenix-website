@@ -47,18 +47,61 @@ export default function BioAsiaPopup() {
     }
   }, [pathname]);
 
-  // 行事曆快捷加入觸發器（點擊直接帶入大展與展位資訊）
+  // 智慧路由分流觸發器
   const handleAddToCalendar = (e: React.MouseEvent) => {
     e.stopPropagation(); // 防止點擊觸發 overlay 關閉
     
-    const eventTitle = encodeURIComponent("2026 亞洲美容保養．生技保健大展 | 恆達機械 K202");
-    const eventDates = "20260716T020000Z/20260719T100000Z"; // UTC時間（對應台灣 10:00 - 18:00）
-    const eventDetails = encodeURIComponent("展位編號：K202 (恆達機械)。現場展示頂尖軟膠囊製造技術與核心模具工藝，Fenix 團隊提供全程現場技術支援。");
-    const eventLocation = encodeURIComponent("台北南港展覽館 1 館 1 樓 (國外廠商區), 115台北市南港區經貿二路1號");
+    const rawTitle = "2026 亞洲美容保養．生技保健大展 | 恆達機械 K202";
+    const rawDetails = "展位編號：K202 (恆達機械)。現場展示頂尖軟膠囊製造技術與核心模具工藝，Fenix 團隊提供全程現場技術支援。";
+    const rawLocation = "台北南港展覽館 1 館 1 樓 (國外廠商區), 115台北市南港區經貿二路1號";
     
-    const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${eventTitle}&dates=${eventDates}&details=${eventDetails}&location=${eventLocation}`;
-    
-    window.open(googleCalendarUrl, '_blank');
+    // 展期：2026/07/16 10:00 ~ 2026/07/19 18:00 (台灣時間對應 UTC 02:00 ~ 10:00)
+    const dtStart = "20260716T020000Z";
+    const dtEnd = "20260719T100000Z";
+
+    // 偵測是否為 iOS / iPadOS 環境 (包含 iOS 13+ 的 iPad 偽裝桌機偵測)
+    const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : '';
+    const isIOS = /iPad|iPhone|iPod/.test(userAgent) || 
+                  (typeof navigator !== 'undefined' && navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+    if (isIOS) {
+      // 【iOS / iPadOS 解決方案】：建立 ICS 字串，透過 Blob 與 Object URL 直接呼叫 Apple 原生行事曆卡片
+      const icsContent = [
+        "BEGIN:VCALENDAR",
+        "VERSION:2.0",
+        "PRODID:-//Fenix Enterprise//BioAsia Expo//EN",
+        "BEGIN:VEVENT",
+        `UID:${Date.now()}@fenixmech.com`,
+        `DTSTAMP:20260618T000000Z`,
+        `DTSTART:${dtStart}`,
+        `DTEND:${dtEnd}`,
+        `SUMMARY:${rawTitle}`,
+        `DESCRIPTION:${rawDetails}`,
+        `LOCATION:${rawLocation}`,
+        "END:VEVENT",
+        "END:VCALENDAR"
+      ].join("\r\n");
+
+      const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+      const blobUrl = URL.createObjectURL(blob);
+      
+      // 直接導向此物件網址，iOS 會自動辨識並開啟原生行事曆字卡，絕不轉頁或下載檔案
+      window.location.href = blobUrl;
+      
+      // 延遲釋放記憶體記憶體空間
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 150);
+
+    } else {
+      // 【Android 安卓與電腦桌機環境】：一律直接跳轉至 Google Calendar 網頁版，不下載檔案
+      const eventTitle = encodeURIComponent(rawTitle);
+      const eventDates = `${dtStart}/${dtEnd}`;
+      const eventDetails = encodeURIComponent(rawDetails);
+      const eventLocation = encodeURIComponent(rawLocation);
+      
+      const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${eventTitle}&dates=${eventDates}&details=${eventDetails}&location=${eventLocation}`;
+      
+      window.open(googleCalendarUrl, '_blank');
+    }
   };
 
   const handleClose = () => {
@@ -108,6 +151,7 @@ export default function BioAsiaPopup() {
             <div style={{ ...styles.infoBox, minHeight: isMobile ? 'auto' : '105px' }}>
               <div style={styles.infoRow}>
                 <p style={styles.infoText}><strong>📅 日期：</strong>2026 / 7 / 16 (四) - 7 / 19 (日)</p>
+                {/* 移除原本可能帶有手機字眼的標籤，完全統一為「加到行事曆」 */}
                 <button onClick={handleAddToCalendar} style={styles.calendarMiniBtn}>
                   🗓️ 加到行事曆
                 </button>
